@@ -1,54 +1,76 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b14">
-<link rel="manifest" href="manifest.webmanifest">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>DENG</title>
 <style>
-*{box-sizing:border-box}body{margin:0;background:#070b14;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:650px;margin:auto;padding:calc(24px + env(safe-area-inset-top)) 20px 110px}
-.logo{text-align:center;font-size:38px;font-weight:900;letter-spacing:9px;margin-top:25px}
-.sub{text-align:center;color:#8991a5;margin:8px 0 34px}
-.search{display:flex;background:#141b2b;border:1px solid #252e43;border-radius:28px;padding:5px}
-.search input{flex:1;background:transparent;border:0;outline:0;color:white;font-size:16px;padding:14px;direction:rtl}
-.search button{width:48px;border:0;border-radius:24px;color:white;background:linear-gradient(135deg,#8b35ff,#159dff);font-size:20px}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:32px}
-.item{text-align:center;font-size:12px;color:#dfe5f1;cursor:pointer}.icon{aspect-ratio:1;border-radius:19px;display:grid;place-items:center;font-size:27px;margin-bottom:7px;background:linear-gradient(135deg,#8b35ff,#159dff)}
-.card{margin-top:35px;background:#111827;border:1px solid #222d42;border-radius:20px;padding:18px;line-height:1.7;color:#cbd3e1}
-h2{font-size:18px;margin-top:30px}.history{display:grid;gap:9px}.row{background:#101725;border-radius:14px;padding:13px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer}
-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(10,14,24,.94);backdrop-filter:blur(15px);border-top:1px solid #20293b;padding:11px 16px calc(11px + env(safe-area-inset-bottom));display:flex;justify-content:space-around;color:#9aa4b7}
-nav span.active{color:#b887ff}
+*{box-sizing:border-box}
+body{margin:0;background:#070b14;color:#fff;font-family:Arial,sans-serif}
+main{max-width:650px;margin:auto;padding:60px 20px}
+.logo{text-align:center;font-size:48px;font-weight:900;letter-spacing:12px}
+.sub{text-align:center;color:#8991a5;margin:15px 0 50px;font-size:20px}
+.search{display:flex;background:#141b2b;border:1px solid #29334a;border-radius:35px;padding:8px}
+.search input{flex:1;background:transparent;border:0;outline:0;color:white;font-size:19px;padding:15px}
+.search button{width:55px;height:55px;border:0;border-radius:50%;background:#397cff;color:white;font-size:25px}
+h2{margin-top:45px}
+#results{margin-top:20px}
+.result{background:#111827;border:1px solid #29334a;border-radius:18px;padding:18px;margin:12px 0}
+.result a{color:#fff;text-decoration:none;font-size:18px}
+.note{margin-top:35px;background:#111827;border:1px solid #29334a;border-radius:20px;padding:20px;color:#cbd5e1;line-height:1.8}
 </style>
 </head>
+
 <body>
 <main>
 <div class="logo">DENG</div>
 <div class="sub">Dengê te, bi te re.</div>
+
 <form class="search" id="searchForm">
-<input id="q" placeholder="ابحث في الويب أو أدخل اسم موقع">
-<button>←</button>
+<input id="q" placeholder="ابحث داخل DENG" required>
+<button type="submit">⌕</button>
 </form>
-<div class="grid">
-<div class="item" data-url="https://www.youtube.com"><div class="icon">▶</div>YouTube</div>
-<div class="item" data-url="https://www.tiktok.com"><div class="icon">♪</div>TikTok</div>
-<div class="item" data-url="https://www.twitch.tv"><div class="icon">▣</div>Twitch</div>
-<div class="item" data-url="https://rumble.com"><div class="icon">▷</div>Rumble</div>
+
+<h2 id="title">نتائج البحث</h2>
+<div id="results"></div>
+
+<div class="note">
+🛡️ ابحث من خلال DENG. نتائج البحث ستظهر هنا داخل الصفحة.
 </div>
-<div class="card">🛡️ ‏DENG يفتح خدمات الويب بالطريقة العادية. لا يتجاوز قيود المواقع، وتشغيل الوسائط يعتمد على ما تسمح به كل خدمة.</div>
-<h2>آخر عمليات البحث</h2><div class="history" id="history"></div>
 </main>
-<nav><span class="active">⌂<br>الرئيسية</span><span onclick="clearHistory()">↻<br>مسح السجل</span><span>♡<br>المفضلة</span><span>⚙<br>الإعدادات</span></nav>
+
 <script>
-const q=document.getElementById('q'), box=document.getElementById('history');
-function resolve(v){v=v.trim();if(/^https?:\/\//i.test(v))return v;if(v.includes('.')&&!v.includes(' '))return'https://'+v;return'https://www.google.com/search?q='+encodeURIComponent(v)}
-function openValue(v){if(!v.trim())return;let h=JSON.parse(localStorage.getItem('dengHistory')||'[]');h=[v,...h.filter(x=>x!==v)].slice(0,12);localStorage.setItem('dengHistory',JSON.stringify(h));render();location.href=resolve(v)}
-function render(){let h=JSON.parse(localStorage.getItem('dengHistory')||'[]');box.innerHTML=h.length?h.map(x=>`<div class="row" onclick='openValue(${JSON.stringify(x)})'>🔎 ${x}</div>`).join(''):'<div style="color:#687286">لا يوجد سجل بعد</div>'}
-function clearHistory(){localStorage.removeItem('dengHistory');render()}
-document.getElementById('searchForm').onsubmit=e=>{e.preventDefault();openValue(q.value)}
-document.querySelectorAll('[data-url]').forEach(x=>x.onclick=()=>location.href=x.dataset.url);
-render();
-if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+const form=document.getElementById("searchForm");
+const q=document.getElementById("q");
+const results=document.getElementById("results");
+
+form.addEventListener("submit",function(e){
+e.preventDefault();
+
+const text=q.value.trim();
+if(!text)return;
+
+results.innerHTML=`
+<div class="result">
+<a href="https://www.youtube.com/results?search_query=${encodeURIComponent(text)}">
+▶️ مشاهدة نتائج "${text}" على YouTube
+</a>
+</div>
+
+<div class="result">
+<a href="https://www.google.com/search?q=${encodeURIComponent(text)}">
+🔎 البحث عن "${text}" على الويب
+</a>
+</div>
+`;
+});
 </script>
-</body></html>
+</body>
+</html>
+
+
+
+
+
+
+
