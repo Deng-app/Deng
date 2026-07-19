@@ -1,0 +1,1 @@
+DENG Web prototype. Upload these files to any static HTTPS web host to use it from Safari and Add to Home Screen.
